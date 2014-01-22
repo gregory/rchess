@@ -8,6 +8,7 @@ module Rchess
 
     def initialize
       @turn = :white
+      @board = BoardBuilder.new_board
     end
 
     def add_player(player, color)
@@ -20,6 +21,8 @@ module Rchess
     def player_moved(player, fromBox, toBox)
       publish(:you_are_frozen)           unless self.player_can_play?(player)
       publish(:you_dont_own_the_piece)   unless self.player_dont_own_the_box?(player, fromBox)
+
+      board.move(fromBox, toBox)
     end
 
     def players
