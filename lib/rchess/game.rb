@@ -14,11 +14,11 @@ module Rchess
       #TODO: validate that the color has not been picked
       raise ArgumentError.new("Unknown color - Choose among: #{COLORS.join(', ')}") unless COLORS.include? color
 
-      players[player.uuid] = {color: color, player: player}
+      players[player.uuid] = {color: color, player: player, chess: false}
     end
 
     def player_moved(player, fromBox, toBox)
-      publish(:you_are_frozen) unless self.player_can_play?(player)
+      publish(:you_are_frozen)           unless self.player_can_play?(player)
       publish(:you_occupy_this_position) unless self.player_dont_own_the_box?(player, toBox)
     end
 
