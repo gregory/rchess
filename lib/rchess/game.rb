@@ -18,11 +18,17 @@ module Rchess
       players[player.uuid] = {color: color, player: player, chess: false}
     end
 
-    def player_moved(player, fromBox, toBox)
+    def player_moved(player, fromPos, toPos)
+      publish(:no_move)                  unless fromPos != toPos
       publish(:you_are_frozen)           unless self.player_can_play?(player)
-      publish(:you_dont_own_the_piece)   unless self.player_dont_own_the_box?(player, fromBox)
+      publish(:you_dont_own_the_piece)   unless self.player_own_box?(player, fromPos)
 
-      board.move(fromBox, toBox)
+      board.on(:cant_reach_box){ publish(:cant_reach_box)}
+      board.on(:unreachable_destination){publish(:unreachable_destination)}
+      board.on(:moved) do |board|
+        @turn = @turn == :white ? :black : :white
+      end
+      board.move(fromPos, toPos)
     end
 
     def players
@@ -37,8 +43,8 @@ module Rchess
       self.players[player.uuid][:color] == self.turn
     end
 
-    def player_own_box?(player, box)
-      self.board.color_for_piece_at(box) == players[player.uuid][:color]
+    def player_own_box?(player, pos)
+      self.board.color_for_piece_at(pos) == players[player.uuid][:color]
     end
   end
 end
