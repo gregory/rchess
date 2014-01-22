@@ -19,7 +19,7 @@ module Rchess
 
     def player_moved(player, fromBox, toBox)
       publish(:you_are_frozen)           unless self.player_can_play?(player)
-      publish(:you_occupy_this_position) unless self.player_dont_own_the_box?(player, toBox)
+      publish(:you_dont_own_the_piece)   unless self.player_dont_own_the_box?(player, fromBox)
     end
 
     def players
