@@ -1,43 +1,42 @@
 module Rchess
   class BoardBuilder
-    def self.new_board
+
+    def self.build
       Board.new.tap do |board|
-        paint_pieces(place_pieces(create_boxes(board)))
+        self.paint_pieces(self.place_pieces(board))
       end
     end
 
     private
 
-    def self.create_boxes(board)
-      board.boxes = []
-      (0..7).each do |y|
-        board.boxes << (0..7).map{ |x| board.box_from_coord(x, y) }
+    def self.paint_pieces(board)
+      #lower lines are white
+      [board.boxes[-1], board.boxes[-2]].each do |line|
+        line.each_with_index{ |box,i| line[i] = box.send(Piece::COLORS[:white]) }
+      end
+
+      [board.boxes[0], board.boxes[1]].each do |line|
+        line.each_with_index{ |box,i| line[i] = box.send(Piece::COLORS[:black]) }
       end
 
       board
     end
 
-    def self.paint_pieces(board)
-      (board.boxes[-1] + board.boxes[-2]).each{|box| box.host = box.host.upcase}
-
-      board
-    end
-
     def self.place_pieces(board)
-      below_line = board.boxes[0]
-      above_line = board.boxes[-1]
+      top_line    = board.boxes[0]
+      bottom_line = board.boxes[-1]
 
-      pieces = Rchess::PieceBuilder::PIECES.invert
+      pieces = Piece::TYPES.invert
 
-      below_line[0].host = below_line[-1].host = above_line[0].host = above_line[-1].host = pieces['rook']
-      below_line[1].host = below_line[-2].host = above_line[1].host = above_line[-2].host = pieces['knight']
-      below_line[2].host = below_line[-3].host = above_line[2].host = above_line[-3].host = pieces['bishop']
+      bottom_line[0] = bottom_line[-1] = top_line[0] = top_line[-1] = pieces['rook']
+      bottom_line[1] = bottom_line[-2] = top_line[1] = top_line[-2] = pieces['knight']
+      bottom_line[2] = bottom_line[-3] = top_line[2] = top_line[-3] = pieces['bishop']
 
-      below_line[3].host = above_line[3].host = pieces['queen']
-      below_line[4].host = above_line[4].host = pieces['king']
+      bottom_line[3] = top_line[3] = pieces['queen']
+      bottom_line[4] = top_line[4] = pieces['king']
 
-      (board.boxes[1] + board.boxes[-2]).each do |box|
-        box.host = pieces['pawn']
+      [board.boxes[1],  board.boxes[-2]].each do |line|
+        line.each_with_index{ |_,i| line[i] = pieces['pawn'] }
       end
 
       board
