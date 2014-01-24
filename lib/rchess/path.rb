@@ -8,7 +8,7 @@ module Rchess
       end
 
       def destinations
-        self.paths.map{ |path| apply_delta_to_path(path) }
+        self.paths.map{ |path| apply_delta_to_path(path).delete_if{ |h| h[:x] < 0 || h[:y] < 0 } }
       end
 
       def paths

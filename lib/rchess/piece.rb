@@ -14,7 +14,7 @@ module Rchess
       black: :upcase
     }
 
-    attr_accessor :coord, :type
+    attr_accessor :coord, :type, :paths
 
     def initialize(options)
       self.type  = options.fetch(:type, TYPES.invert['pawn'])
@@ -32,8 +32,28 @@ module Rchess
       @color = self.type == self.type.downcase ? cases[:downcase] : cases[:upcase]
     end
 
-    def path_to_coord(board, coord)
-      PathBuilder.new(piece, board).paths.detect{ |coords| coords.include?(coord) }
+    def coord=(value)
+      #clean the cached variables
+      @paths = nil
+      @coord = value
+    end
+
+    def paths
+      @paths ||= path_builder.paths.map{|path| path.delete_if{|h| h[:x] < 0 || h[:y] < 0}}.delete_if(&:empty?)
+    end
+
+    def destinations
+      path_builder.destinations.delete_if(&:empty?)
+    end
+
+    def path_to_coord(coord)
+      destinations.detect{ |coords| coords.include?(coord.to_hash) }
+    end
+
+    private
+
+    def path_builder
+      @path_builder ||= PathBuilder.new(self)
     end
   end
 end
