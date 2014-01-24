@@ -1,6 +1,6 @@
 # Rchess
 
-Just a personnal challenge to code a chess game as fast as possible
+Just a personnal challenge to code a chess game [as fast as possible](https://github.com/gregory/rchess/graphs/punch-card)
 
 ## Installation
 
