@@ -12,6 +12,7 @@ module Rchess
       @players = {}
       player_white = value.fetch(:white){ raise ArgumentError.new("Please provide a white player")}
       player_black = value.fetch(:black){ raise ArgumentError.new("Please provide a black player")}
+
       @players[player_black.uuid] = { color: :black, player: player_black }
       @players[player_white.uuid] = { color: :white, player: player_white }
     end
