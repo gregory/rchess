@@ -37,7 +37,8 @@ module Rchess
     end
 
     def path_to_coord(coord)
-      destinations.detect{ |coords| coords.include?(coord.to_hash) }
+      path = destinations.detect{ |coords| coords.include?(coord.to_hash) }
+      [*path].keep_if{ |c| c[:x].abs <= coord.x && c[:y].abs <= coord.y }
     end
 
     private
