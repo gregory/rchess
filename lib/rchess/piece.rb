@@ -31,5 +31,9 @@ module Rchess
       cases = COLORS.invert
       @color = self.type == self.type.downcase ? cases[:downcase] : cases[:upcase]
     end
+
+    def path_to_coord(board, coord)
+      PathBuilder.new(piece, board).paths.detect{ |coords| coords.include?(coord) }
+    end
   end
 end
