@@ -1,7 +1,8 @@
 module Rchess
   class RookMove < Move
-    def initialize(power=7)
+    def initialize(piece,power=7)
       @power = power
+      super(piece)
     end
 
     def available_destinations
