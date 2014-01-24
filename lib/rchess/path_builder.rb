@@ -7,10 +7,6 @@ module Rchess
       @piece = piece
     end
 
-    def paths
-      path_decorator.map(&:paths).flatten(1)
-    end
-
     def destinations
       path_decorator.map(&:destinations).flatten(1)
     end
