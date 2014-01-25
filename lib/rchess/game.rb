@@ -1,11 +1,15 @@
 module Rchess
   class Game
     attr_accessor :board, :players
-    attr_reader :current_player_color
+    attr_reader :current_player_color, :loosed_pieced
 
     def initialize(players)
       self.players          = players
       @current_player_color = Piece::WHITE_COLOR
+    end
+
+    def add_loosed_piece(dstPiece)
+      @loosed_pieces[dstPiece.color] << dstPiece.type
     end
 
     def players=(value)
@@ -23,16 +27,27 @@ module Rchess
       piece = board.piece_at_coord(srcCoord)
       return false unless piece
       return false unless current_player_own_piece?(piece)
+      return false unless board.valid_move?(piece, dstCoord)
 
-      board.move_piece_to_coord!(piece, dstCoord)
-    end
-
-    def current_player_own_piece?(piece)
-      current_player_color == piece.color
+      dstPiece = board.piece_at_coord(dstCoord)
+      add_loosed_piece(dstPiece) if dstPiece
+      board.move_src_to_dst!(piece, dstCoord)
+      switch_current_player
+      true
     end
 
     def board
       @board ||= BoardBuilder.build
+    end
+
+    private
+
+    def switch_current_player
+      @current_player_color = @current_player_color == Piece::WHITE_COLOR ? Piece::BLACK_COLOR : Piece::WHITE_COLOR
+    end
+
+    def current_player_own_piece?(piece)
+      current_player_color == piece.color
     end
   end
 end

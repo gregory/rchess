@@ -1,5 +1,8 @@
+require 'forwardable'
 module Rchess
   class Piece
+    extend Forwardable
+
     TYPES={
       p: 'pawn',
       b: 'bishop',
@@ -9,42 +12,45 @@ module Rchess
       k: 'king'
     }
 
+    WHITE_COLOR = :white
+    BLACK_COLOR = :black
+
     COLORS={
-      white: :downcase,
-      black: :upcase
+      WHITE_COLOR => :downcase,
+      BLACK_COLOR => :upcase
     }
 
-    attr_accessor :coord, :type
+    def_delegators :@coord, :x, :y
+
+    attr_reader :coord
 
     def initialize(options)
-      self.type  = options.fetch(:type, TYPES.invert['pawn'])
-      self.coord = options.fetch(:coord)
+      @board = options.fetch(:board) #The environment
+      @coord = options.fetch(:coord) #The position
     end
 
-    def type=(value)
-      raise ArgumentError.new("Unknown type #{value}") unless TYPES.keys.include?(value.downcase)
-      @type = value
+    def self.type_to_color(type, color)
+      raise ArgumentError.new("Unknown color #{color}") unless COLORS.keys.include? color
+      type.send(COLORS[color])
     end
 
     def color
       return @color if @color
+
       cases = COLORS.invert
-      @color = self.type == self.type.downcase ? cases[:downcase] : cases[:upcase]
+      self.type.downcase == self.type ? cases[:downcase] : cases[:upcase]
     end
 
-    def destinations
-      path_builder.destinations.delete_if(&:empty?)
+    def type
+      @type ||= @board.box_at_coord(@coord)
     end
 
-    def path_to_coord(coord)
-      path = destinations.detect{ |coords| coords.include?(coord.to_hash) }
-      [*path].keep_if{ |c| c[:x].abs <= coord.x && c[:y].abs <= coord.y }
+    def can_goto_coord?(coord)
+      true #TODO: implement
     end
 
-    private
-
-    def path_builder
-      @path_builder ||= PathBuilder.new(self)
+    def is_threaten?
+      false #TODO: implement
     end
   end
 end

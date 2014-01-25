@@ -5,43 +5,69 @@ module Rchess
     BOUDARIES = (0...8)
     EMPTY_BOX = ""
 
-    attr_accessor :boxes
+    attr_reader :loosed_pieces
+    attr_writer :boxes
+
+    def loosed_pieces
+      @loosed_pieces ||= { white: [], black: [] }
+    end
 
     def boxes
       @boxes ||= Array.new(BOUDARIES.count){ Array.new(BOUDARIES.count){ EMPTY_BOX }}
+    end
+
+    def movement_within_board?(srcCoord, dstCoord)
+      coord_within_boundaries?(srcCoord) && coord_within_boundaries?(dstCoord)
+    end
+
+    def piece_at_coord(coord)
+      box_at_coord(coord) == EMPTY_BOX ? nil : Piece.new({coord: coord, board: self})
+    end
+
+    def box_at_coord(coord)
+      @boxes[coord.y][coord.x]
+    end
+
+    def move_src_to_dst!(srcCoord, dstCoord)
+      srcPiece      = piece_at_coord(srcCoord)
+      dstPiece      = piece_at_coord(dstCoord)
+      src_box_value = dstPiece.nil? || dstPiece.color != srcPiece.color ? EMPTY_BOX : dstPiece.type # if diff color or nil we erase, else we swap
+
+      @boxes[srcPiece.y][srcPiece.x], @boxes[dstCoord.y][dstCoord.x] = src_box_value, srcPiece.type
+    end
+
+    def valid_move?(piece, dstCoord)
+      piece.can_goto_coord?(dstCoord) && !king_would_be_checked?(piece, dstCoord)
+    end
+
+    def king_for_color(color)
+      king_type  = Piece.type_to_color(Piece::TYPES.invert['king'], color)
+      king_index = self.boxes.flatten.index(king_type)
+      king_coord = coord_from_index(king_index)
+
+      Piece.new({coord: king_coord, board: self})
+    end
+
+    private
+
+    def king_would_be_checked?(piece, dstCoord)
+      #simulate the next board
+      next_board = Board.new
+      #TODO: need a more efficient way of copying the values
+      next_board.boxes = Marshal.load(Marshal.dump(@boxes))
+      next_board.move_src_to_dst!(piece.coord, dstCoord)
+
+      king = next_board.king_for_color(piece.color)
+      king.is_threaten?
     end
 
     def coord_within_boundaries?(coord)
       BOUDARIES.include?(coord.x) && BOUDARIES.include?(coord.y)
     end
 
-    def movement_within_board?(srcCoord, dstCoord)
-      coord_within_boundaries?(srcCoord) || coord_within_boundaries?(dstCoord)
-    end
-
-    def piece_color_at_coord(coord)
-      piece = self.piece_at_coord(coord)
-      piece.nil? ? nil : piece.color
-    end
-
-    def piece_at_coord(coord)
-      piece_type = self.boxes[coord.y][coord.x]
-      piece_type == EMPTY_BOX ? nil : Piece.new({type: piece_type, coord: coord})
-    end
-
-    def valid_path?(srcCoord, dstCoord)
-      piece = piece_at_coord(srcCoord)
-
-      return false unless piece
-      path = piece_at_coord(srcCoord).path_to_coord(dstCoord)
-      return false if path.empty?
-      free_path?(path)
-    end
-
-    def free_path?(path)
-      tmp_path = path.dup
-      tmp_path.pop #the destination can be occupied
-      !tmp_path.any?{ |coord| piece_at_coord(Coord.new(coord)) != nil }
+    def coord_from_index(index)
+      width = BOUDARIES.count
+      Coord.new({y: index/width, x: index%width})
     end
   end
 end
