@@ -20,7 +20,7 @@ module Rchess
     def move(srcCoord, dstCoord)
       return false unless board.movement_within_board?(srcCoord, dstCoord)
       return false unless current_player_own_piece_at_coord?(srcCoord)
-      return false unless board.valid_path?(srcCoord, dstCoord)
+      board.move(srcCoord, dstCoord)
     end
 
     def current_player_own_piece_at_coord?(coord)
