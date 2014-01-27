@@ -4,12 +4,12 @@ module Rchess
     extend Forwardable
 
     TYPES={
-      p: 'pawn',
-      b: 'bishop',
-      q: 'queen',
-      c: 'knight',
-      r: 'rook',
-      k: 'king'
+      p: ->(coord, board){ Paths::Pawn.new(  {coord: coord, board: board}) },
+      b: ->(coord, board){ Paths::Bishop.new({coord: coord, board: board}) },
+      q: ->(coord, board){ Paths::Queen.new( {coord: coord, board: board}) },
+      c: ->(coord, board){ Paths::Knight.new({coord: coord, board: board}) },
+      r: ->(coord, board){ Paths::Rook.new(  {coord: coord, board: board}) },
+      k: ->(coord, baord){ Paths::King.new(  {coord: coord, board: board}) }
     }
 
     WHITE_COLOR = :white
@@ -21,6 +21,7 @@ module Rchess
     }
 
     def_delegators :@coord, :x, :y
+    def_delegators :paths, :destinations
 
     attr_reader :coord
 
@@ -41,16 +42,27 @@ module Rchess
       self.type.downcase == self.type ? cases[:downcase] : cases[:upcase]
     end
 
+    def direction
+      #TODO: make it more dynamic
+      self.color == WHITE_COLOR ? :up : :down
+    end
+
     def type
       @type ||= @board.box_at_coord(@coord)
     end
 
     def can_goto_coord?(coord)
-      true #TODO: implement
+      destinations.flatten.any?{|dest| dest.x == coord.x && dest.y == coord.y }
     end
 
     def is_threaten?
       false #TODO: implement
+    end
+
+    private
+
+    def paths
+      @paths ||= TYPES[self.type.downcase].call(@coord, @board)
     end
   end
 end
