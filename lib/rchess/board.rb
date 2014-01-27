@@ -41,7 +41,7 @@ module Rchess
     end
 
     def king_for_color(color)
-      king_type  = Piece.type_to_color(Piece::TYPES.invert['king'], color)
+      king_type  = Piece.type_to_color(:k, color) #TODO: make the type dynamic ~> piece::TYPES['king']
       king_index = self.boxes.flatten.index(king_type)
       king_coord = coord_from_index(king_index)
 
