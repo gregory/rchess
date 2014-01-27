@@ -1,15 +1,16 @@
 module Rchess
   class Game
     attr_accessor :board, :players
-    attr_reader :current_player_color, :loosed_pieced
+    attr_reader :current_player_color, :loosed_pieces
 
     def initialize(players)
       self.players          = players
       @current_player_color = Piece::WHITE_COLOR
+      @loosed_pieces = {Piece::WHITE_COLOR => [], Piece::BLACK_COLOR =>  []}
     end
 
     def add_loosed_piece(dstPiece)
-      @loosed_pieces[dstPiece.color] << dstPiece.type
+      self.loosed_pieces[dstPiece.color] << dstPiece.type
     end
 
     def players=(value)
