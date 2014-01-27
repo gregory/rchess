@@ -1,14 +1,16 @@
 module Rchess
   module Paths
     class Base
-      attr_reader :srcCoord
+      attr_reader :coord
+      attr_accessor :board
 
-      def initialize(coord)
-        @srcCoord = coord
+      def initialize(params)
+        @coord = params.fetch(:coord)
+        @board = params.fetch(:board)
       end
 
       def destinations
-        self.paths.map{ |path| apply_delta_to_path(path).delete_if{ |h| h[:x] < 0 || h[:y] < 0 } }
+        @destinations ||= self.paths.map{ |path| apply_delta_to_path(path).delete_if{ |coord| coord.x < 0 || coord.y < 0 } }
       end
 
       def paths
@@ -18,7 +20,7 @@ module Rchess
       private
 
       def apply_delta_to_path(path)
-        path.map{ |delta| self.srcCoord.apply_delta(delta) }
+        path.map{ |delta| self.coord.apply_delta(delta) }
       end
     end
   end

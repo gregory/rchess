@@ -1,33 +1,37 @@
 module Rchess
-  class PathBuilder
-    attr_accessor :piece
+  class Destinations
+    #def initialize(params)
+      #@board    = params.fetch(:board)
+      #@srcCoord = params.fetch(:srcCoord)
+    #end
 
-    #TODO: clean the argument dependency
-    def initialize(piece)
-      @piece = piece
-    end
+    #def threaten_by_color?(color)
+      #paths_type_mapping.each do |type, paths|
+        #paths.map(&:destinations).flatten.any? do |coordH|
+          #dst = @board.piece_at_coord(Coord.new(coordH))
 
-    def destinations
-      path_decorator.map(&:destinations).flatten(1)
-    end
+          ##if there is a piece, with the type corresponding to the path, and a different color
+          #!dst.nil? && dst.type.downcase == type && dst.color != color
+        #end
+      #end
+    #end
 
-    private
+    #def destinations_for_type(type)
+      #paths_type_mapping[:type].map(&:destinations).flatten(1)
+    #end
 
-    def path_decorator
-      case piece.type.downcase
-      when :p
-        [Paths::Pawn.new(piece.coord)]
-      when :b
-        [Paths::Bishop.new(piece.coord)]
-      when :q
-        [Paths::Bishop.new(piece.coord), Paths::Rook.new(piece.coord)].flatten(1)
-      when :c
-        [Paths::Knight.new(piece.coord)]
-      when :r
-        [Paths::Rook.new(piece.coord)]
-      when :k
-        [Paths::Bishop.new(piece.coord, 1), Paths::Rook.new(piece.coord, 1)].flatten(1)
-      end
-    end
+    #private
+
+    #def paths_type_mapping
+      ##TODO: find a way not to load all those objects
+      #{
+        #p: [Paths::Pawn.new({srcCoord: @srcCoord, board: @board})],
+        #b: [Paths::Bishop.new({srcCoord: @srcCoord, board: @board})],
+        #q: [Paths::Bishop.new({srcCoord: @srcCoord, board: @board}), Paths::Rook.new({srcCoord: @srcCoord, board: @board})].flatten(1),
+        #c: [Paths::Knight.new({srcCoord: @srcCoord, board: @board})],
+        #r: [Paths::Rook.new({srcCoord: @srcCoord, board: @board})],
+        #k: [Paths::Bishop.new({srcCoord: @srcCoord, board: @board}, 1), Paths::Rook.new({srcCoord: @srcCoord, board: @board}, 1)].flatten(1)
+      #}
+    #end
   end
 end

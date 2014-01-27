@@ -1,9 +1,9 @@
 module Rchess
   module Paths
     class Bishop < Base
-      def initialize(coord, power=8)
-        @power = power
-        super(coord)
+      def initialize(params)
+        @power = params.fetch(:power, 8)
+        super(params)
       end
 
       def paths

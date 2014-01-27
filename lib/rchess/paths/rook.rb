@@ -1,8 +1,8 @@
 module Rchess
   module Paths
     class Rook < Base
-      def initialize(coord, power=8)
-        @power = power
+      def initialize(params)
+        @power = params.fetch(:power, 8)
         super(coord)
       end
 
