@@ -8,7 +8,7 @@ module Rchess
     end
 
     def apply_delta(delta)
-      { x: (self.x + delta[:x]), y: (self.y + delta[:y]) }
+      Coord.new({ x: (self.x + delta[:x]), y: (self.y + delta[:y]) })
     end
 
     def to_hash
