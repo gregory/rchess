@@ -8,6 +8,17 @@ module Rchess
     attr_reader :loosed_pieces
     attr_writer :boxes
 
+    def initialize
+      @boxes =[[:R, :C, :B, :Q, :K, :B, :C, :R],
+               [:P, :P, :P, :P, :P, :P, :P, :P],
+               ["", "", "", "", "", "", "", ""],
+               ["", "", "", "", "", "", "", ""],
+               ["", "", "", "", "", "", "", ""],
+               ["", "", "", "", "", "", "", ""],
+               [:p, :p, :p, :p, :p, :p, :p, :p],
+               [:r, :c, :b, :q, :k, :b, :c, :r]]
+    end
+
     def loosed_pieces
       @loosed_pieces ||= { white: [], black: [] }
     end
@@ -37,7 +48,7 @@ module Rchess
     end
 
     def valid_move?(piece, dstCoord)
-      piece.can_goto_coord?(dstCoord) && !king_would_be_checked?(piece, dstCoord)
+      piece.can_goto_coord?(dstCoord) && !king_would_be_threatened?(piece, dstCoord)
     end
 
     def king_for_color(color)
@@ -50,7 +61,7 @@ module Rchess
 
     private
 
-    def king_would_be_checked?(piece, dstCoord)
+    def king_would_be_threatened?(piece, dstCoord)
       #simulate the next board
       next_board = Board.new
       #TODO: need a more efficient way of copying the values
