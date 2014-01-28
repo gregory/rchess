@@ -24,7 +24,7 @@ module Rchess
       end
 
       def piece_first_move?
-        srcPiece.coord.y == 1 && srcPiece.direction == :up || srcPiece.coord.y == 6 && srcPiece.direction == :down
+        srcPiece.coord.y == 1 && srcPiece.direction == :down || srcPiece.coord.y == 6 && srcPiece.direction == :up
       end
 
       def take_piece
@@ -36,7 +36,11 @@ module Rchess
       end
 
       def move_forward
-        [{x: 0, y: direction}]
+        [{x: 0, y: direction}].select do |delta|
+          dstCoord = self.coord.apply_delta(delta)
+          dstPiece = self.board.piece_at_coord(dstCoord)
+          dstPiece.nil?
+        end
       end
     end
   end
