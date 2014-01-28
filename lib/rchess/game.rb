@@ -1,25 +1,15 @@
 module Rchess
   class Game
-    attr_accessor :board, :players
+    attr_accessor :board
     attr_reader :current_player_color, :loosed_pieces
 
-    def initialize(players)
-      self.players          = players
+    def initialize
       @current_player_color = Piece::WHITE_COLOR
       @loosed_pieces = {Piece::WHITE_COLOR => [], Piece::BLACK_COLOR =>  []}
     end
 
     def add_loosed_piece(dstPiece)
       self.loosed_pieces[dstPiece.color] << dstPiece.type
-    end
-
-    def players=(value)
-      @players = {}
-      player_white = value.fetch(:white){ raise ArgumentError.new("Please provide a white player")}
-      player_black = value.fetch(:black){ raise ArgumentError.new("Please provide a black player")}
-
-      @players[player_black.uuid] = { color: Piece::BLACK_COLOR, player: player_black }
-      @players[player_white.uuid] = { color: Piece::WHITE_COLOR, player: player_white }
     end
 
     def move!(srcCoord, dstCoord)
