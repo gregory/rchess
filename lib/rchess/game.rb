@@ -24,11 +24,16 @@ module Rchess
       add_loosed_piece(dstPiece) if dstPiece
       board.move_src_to_dst!(piece, dstCoord)
       switch_current_player
-      true
+      !checked?
+    end
+
+    def checked?
+      king = board.king_for_color(current_player_color)
+      king.is_threaten?
     end
 
     def board
-      @board ||= BoardBuilder.build
+      @board ||= Board.new
     end
 
     private
