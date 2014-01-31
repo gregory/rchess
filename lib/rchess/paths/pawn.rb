@@ -7,36 +7,29 @@ module Rchess
 
       private
 
-      def direction
-        srcPiece.direction == :up ? -1 : 1
-      end
-
-      def srcPiece
-        @srcPiece ||= self.board.piece_at_coord(self.coord)
-      end
-
       def move_2_if_first_move
         if piece_first_move?
-          [{x: 0, y: 2*direction}, {x: 0, y: 2*direction}]
+          [{x: 0, y: 2*srcDirection}, {x: 0, y: 2*srcDirection}]
         else
           []
         end
       end
 
       def piece_first_move?
-        srcPiece.coord.y == 1 && srcPiece.direction == :down || srcPiece.coord.y == 6 && srcPiece.direction == :up
+        self.coord.y == 1 && self.srcDirection == 1 || self.coord.y == 6 && self.srcDirection == -1
       end
 
       def take_piece
-        [{x: 1, y: direction}, {x: -1, y: direction}].select do |delta|
+        #TODO: remove the color notion, there is only 1 piece that goes up and one that goes down
+        [{x: 1, y: srcDirection}, {x: -1, y: srcDirection}].select do |delta|
           dstCoord = self.coord.apply_delta(delta)
           dstPiece = self.board.piece_at_coord(dstCoord)
-          !dstPiece.nil? && dstPiece.direction != srcPiece.direction
+          !dstPiece.nil? && dstPiece.direction != srcDirection
         end
       end
 
       def move_forward
-        [{x: 0, y: direction}].select do |delta|
+        [{x: 0, y: srcDirection}].select do |delta|
           dstCoord = self.coord.apply_delta(delta)
           dstPiece = self.board.piece_at_coord(dstCoord)
           dstPiece.nil?

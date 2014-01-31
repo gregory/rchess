@@ -39,24 +39,30 @@ module Rchess
       @boxes[coord.y][coord.x]
     end
 
-    def move_src_to_dst!(srcCoord, dstCoord)
-      srcPiece      = piece_at_coord(srcCoord)
-      dstPiece      = piece_at_coord(dstCoord)
-      src_box_value = dstPiece.nil? || dstPiece.color != srcPiece.color ? EMPTY_BOX : dstPiece.type # if diff color or nil we erase, else we swap
-
-      @boxes[srcPiece.y][srcPiece.x], @boxes[dstCoord.y][dstCoord.x] = src_box_value, srcPiece.type
-    end
-
     def valid_move?(piece, dstCoord)
-      piece.can_goto_coord?(dstCoord) && !king_would_be_threatened?(piece, dstCoord)
+      piece.can_goto_coord?(dstCoord) #&& !king_would_be_threatened?(piece, dstCoord)
     end
 
-    def king_for_color(color)
-      king_type  = Piece.type_to_color(:k, color) #TODO: make the type dynamic ~> piece::TYPES['king']
-      king_index = self.boxes.flatten.index(king_type)
-      king_coord = coord_from_index(king_index)
+    def move_piece_to_coord!(piece, coord)
+      dstPiece   = piece_at_coord(coord)
+      dst_type = dstPiece.nil? || dstPiece.color != piece.color ? EMPTY_BOX : dstPiece.type # if diff color or nil we erase, else we swap
 
-      Piece.new({coord: king_coord, board: self})
+      @boxes[piece.y][piece.x], @boxes[coord.y][coord.x] = dst_type, piece.type
+    end
+
+    def coord_is_threatened_by_color?(target_coord, color)
+      paths_from_target = Paths::Base.threaten_destinations_from_coord(target_coord, self)
+
+      paths_from_target.flatten(1).any? do |coord|
+        dstPiece = self.piece_at_coord(coord)
+        dstPiece && dstPiece.color != color
+      end
+    end
+
+    def coord_for_type_and_color(type, color)
+      piece_type  = Piece.type_to_color(type, color) #TODO: make the type dynamic ~> piece::TYPES['king']
+      piece_index = self.boxes.flatten.index(piece_type)
+      coord_from_index(piece_index)
     end
 
     private
@@ -66,10 +72,11 @@ module Rchess
       next_board = Board.new
       #TODO: need a more efficient way of copying the values
       next_board.boxes = Marshal.load(Marshal.dump(@boxes))
-      next_board.move_src_to_dst!(piece.coord, dstCoord)
+      next_board.move_piece_to_coord!(piece, dstCoord)
 
-      king = next_board.king_for_color(piece.color)
-      king.is_threaten?
+      king_coord = coord_for_type_and_color(:k, piece.color)
+      oponent_color = piece.color == Piece::WHITE_COLOR ? Piece::BLACK_COLOR : Piece::WHITE_COLOR
+      coord_is_threatened_by_color?(king_coord, oponent_color)
     end
 
     def coord_within_boundaries?(coord)

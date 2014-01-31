@@ -7,7 +7,9 @@ module Rchess
       end
 
       def paths
-        [diag_paths].flatten(1)
+        [diag_paths].flatten(1).select do |path|
+          path.select
+        end
       end
 
       private
