@@ -2,11 +2,11 @@ module Rchess
   class Board
     include Wisper::Publisher
 
-    BOUDARIES = (0...8)
+    BOUNDARIES = (0...8)
     EMPTY_BOX = ""
 
     attr_reader :loosed_pieces
-    attr_writer :boxes
+    attr_accessor :boxes
 
     def initialize
       @boxes =[[:R, :C, :B, :Q, :K, :B, :C, :R],
@@ -21,10 +21,6 @@ module Rchess
 
     def loosed_pieces
       @loosed_pieces ||= { white: [], black: [] }
-    end
-
-    def boxes
-      @boxes ||= Array.new(BOUDARIES.count){ Array.new(BOUDARIES.count){ EMPTY_BOX }}
     end
 
     def movement_within_board?(srcCoord, dstCoord)
@@ -80,11 +76,11 @@ module Rchess
     end
 
     def coord_within_boundaries?(coord)
-      BOUDARIES.include?(coord.x) && BOUDARIES.include?(coord.y)
+      BOUNDARIES.include?(coord.x) && BOUNDARIES.include?(coord.y)
     end
 
     def coord_from_index(index)
-      width = BOUDARIES.count
+      width = BOUNDARIES.count
       Coord.new({y: index/width, x: index%width})
     end
   end
